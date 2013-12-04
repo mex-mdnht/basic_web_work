@@ -18,7 +18,17 @@ module.exports = (grunt) ->
 				dest: 'source/coffee/_concat_main.coffee'
 
 		clean:
-			maincoffee: ["<%= concat.maincoffee.dest %>"]
+			concated_coffee: ["<%= concat.maincoffee.dest %>"]
+			
+			expanded_js:
+				expand: true,
+				cwd: 'deploy/javascript',
+				src: ['*.js', '!*.min.js']
+				
+			expanded_css:
+				expand: true,
+				cwd: 'deploy/stylesheet',
+				src: ['*.css', '!*.min.css']
 
 		coffee:
 			mainjs:
@@ -29,21 +39,21 @@ module.exports = (grunt) ->
 			maincss:
 				options:
 					style: 'expanded'
-				files:
+				files:[
 					expand: true,
 					cwd: 'source/sass',
 					src: ['**/*.scss'],
 					dest: 'deploy/stylesheet',
-					ext: '.css'
+					ext: '.css']
 
 		uglify:
 			minifyjs:
-				files:
+				files:[
 					expand: true,
 					cwd: 'deploy/javascript',
 					src: ['*.js', '!*.min.js'],
 					dest: 'deploy/javascript',
-					ext: '.min.js'
+					ext: '.min.js']
 					
 		cssmin: 
 			minifycss: 
@@ -79,8 +89,10 @@ module.exports = (grunt) ->
 	#カスタムタスク
 
 	#デフォルト
-	grunt.registerTask 'compile_coffee', ['concat','coffee', 'clean']
+	grunt.registerTask 'compile_coffee', ['concat','coffee', 'clean:concated_coffee']
 	grunt.registerTask 'compile_sass',['sass']
+	grunt.registerTask 'minifyjs',['uglify', 'clean:expanded_js']
+	grunt.registerTask 'minifycss',['cssmin', 'clean:expanded_css']
 	grunt.registerTask 'publish_dev',['uglify', 'cssmin', 'ftp-deploy']
 
 
