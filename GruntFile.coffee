@@ -12,14 +12,10 @@ module.exports = (grunt) ->
 	grunt.initConfig
 		#テンプレートに設定引き継ぎ
 		pkg: pkg
-		concat:
-			maincoffee:
-				src: ['source/coffee/**/*.coffee','!source/coffee/_concat_main.coffee']
-				dest: 'source/coffee/_concat_main.coffee'
+		#concat:
+			
 
 		clean:
-			concated_coffee: ["<%= concat.maincoffee.dest %>"]
-			
 			expanded_js:
 				expand: true,
 				cwd: 'deploy/javascript',
@@ -32,8 +28,15 @@ module.exports = (grunt) ->
 
 		coffee:
 			mainjs:
-				src: ['source/coffee/_concat_main.coffee']
-				dest: 'deploy/javascript/main.js'
+				files:[
+					expand: true,
+					cwd: 'source',
+					src: ['**/_*.coffee'],
+					dest: 'deploy',
+					ext: '.js',
+					rename:(dest, src)=>
+						return src.replace(/_(.*)\.js$/,"$1.js" )
+					]
 
 		sass:
 			maincss:
@@ -41,9 +44,9 @@ module.exports = (grunt) ->
 					style: 'expanded'
 				files:[
 					expand: true,
-					cwd: 'source/sass',
-					src: ['**/*.scss'],
-					dest: 'deploy/stylesheet',
+					cwd: 'source',
+					src: ['**/*.scss', '!**/_*.scss'],
+					dest: 'deploy',
 					ext: '.css']
 
 		uglify:
@@ -65,12 +68,12 @@ module.exports = (grunt) ->
 
 		watch:
 			coffee:
-				files:'source/coffee/**/*.coffee'
+				files:'source/**/*.coffee'
 				tasks:['compile_coffee']
 				options:
 					livereload:true
 			sass:
-				files:'source/sass/**/*.sass'
+				files:'source/**/*.scss'
 				tasks:['compile_sass']
 				options:
 					livereload:true
@@ -89,7 +92,7 @@ module.exports = (grunt) ->
 	#カスタムタスク
 
 	#デフォルト
-	grunt.registerTask 'compile_coffee', ['concat','coffee', 'clean:concated_coffee']
+	grunt.registerTask 'compile_coffee', ['concat','coffee']
 	grunt.registerTask 'compile_sass',['sass']
 	grunt.registerTask 'minifyjs',['uglify', 'clean:expanded_js']
 	grunt.registerTask 'minifycss',['cssmin', 'clean:expanded_css']
