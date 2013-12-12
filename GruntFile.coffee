@@ -35,7 +35,7 @@ module.exports = (grunt) ->
 					dest: 'deploy',
 					ext: '.js',
 					rename:(dest, src)=>
-						return src.replace(/_(.*)\.js$/,"$1.js" )
+						return dest+"/"+src.replace(/_(.*)\.js$/,"$1.js" )
 					]
 
 		sass:
@@ -78,6 +78,14 @@ module.exports = (grunt) ->
 				options:
 					livereload:true
 		
+		imagemin:
+			minallimgs:
+				files: [
+					expand: true,
+					cwd: 'deploy',
+					src: ['**/*.{png,gif}'],
+					dest: 'deploy']
+
 		'ftp-deploy':
 			build:
 				auth:
