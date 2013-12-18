@@ -3,7 +3,10 @@ module.exports = (grunt) ->
 
 	#パッケージ情報読み込み
 	pkg = grunt.file.readJSON 'package.json'
-
+	
+	#upするディレクトリ
+	deploydest:=""
+	
 	#全てのnpmタスク読み込み
 	for taskName of pkg.devDependencies when taskName.substring(0, 6) is 'grunt-'
 		grunt.loadNpmTasks taskName
@@ -12,6 +15,7 @@ module.exports = (grunt) ->
 	grunt.initConfig
 		#テンプレートに設定引き継ぎ
 		pkg: pkg
+
 		#concat:
 			
 
@@ -95,6 +99,26 @@ module.exports = (grunt) ->
 				src: 'deploy',
 				dest: '/public_html',
 				exclusions: ['deploy/**/.DS_Store', 'deploy/**/Thumbs.db', 'deploy/**/_*.*']
+
+		compress:
+			main:
+				options:
+					archive:()=>
+						dd = new Date()
+						yy = dd.getYear()
+						mm = dd.getMonth() + 1
+						dd = dd.getDate()
+						if (yy < 2000) then  yy += 1900
+						if (mm < 10) then mm = "0" + mm
+						if (dd < 10) then dd = "0" + dd
+						dateString = yy.toString()+mm.toString()+dd.toString()
+						return 'archive/'+pkg.name+dateString+'.zip'
+				files: [
+					expand: true,
+					cwd: 'deploy/',
+					src: ['**'],
+					dest: deploydest
+				]
 
 
 	#カスタムタスク
