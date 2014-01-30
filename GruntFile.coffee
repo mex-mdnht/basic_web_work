@@ -5,7 +5,7 @@ module.exports = (grunt) ->
 	pkg = grunt.file.readJSON 'package.json'
 	
 	#upするディレクトリ
-	deploydest:=""
+	deploydest = ""
 	
 	#全てのnpmタスク読み込み
 	for taskName of pkg.devDependencies when taskName.substring(0, 6) is 'grunt-'
@@ -17,7 +17,7 @@ module.exports = (grunt) ->
 		pkg: pkg
 
 		#concat:
-			
+		#
 
 		clean:
 			expanded_js:

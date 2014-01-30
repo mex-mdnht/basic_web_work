@@ -46,3 +46,6 @@ www-ghdeploy
 
 #node modules
 node_modules
+
+#raw resources
+_raw
