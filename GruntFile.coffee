@@ -17,7 +17,10 @@ module.exports = (grunt) ->
 		pkg: pkg
 
 		#concat:
-		#
+		concat:
+			coffee_main:
+				src: ['source/javascript/main/*.coffee']
+				dest: 'source/javascript/_main.coffee'
 
 		clean:
 			expanded_js:
@@ -36,7 +39,7 @@ module.exports = (grunt) ->
 					expand: true,
 					cwd: 'source',
 					src: ['**/_*.coffee'],
-					dest: 'deploy',
+					dest: 'source',
 					ext: '.js',
 					rename:(dest, src)=>
 						return dest+"/"+src.replace(/_(.*)\.js$/,"$1.js" )
@@ -50,25 +53,34 @@ module.exports = (grunt) ->
 					expand: true,
 					cwd: 'source',
 					src: ['**/*.scss', '!**/_*.scss'],
-					dest: 'deploy',
+					dest: 'source',
 					ext: '.css']
 
 		uglify:
 			minifyjs:
 				files:[
 					expand: true,
-					cwd: 'deploy/javascript',
+					cwd: 'source/javascript',
 					src: ['*.js', '!*.min.js'],
 					dest: 'deploy/javascript',
-					ext: '.min.js']
+					ext: '.js']
 					
 		cssmin: 
 			minifycss: 
 				expand: true,
-				cwd: 'deploy/stylesheet/',
+				cwd: 'source/stylesheet/',
 				src: ['*.css', '!*.min.css'],
 				dest: 'deploy/stylesheet/',
-				ext: '.min.css'
+				ext: '.css'
+		
+		#server
+		connect:
+			server:
+				options:
+					hostname: "*"
+					port: 9500
+					base: 'source'
+					livereload: true
 
 		watch:
 			coffee:
@@ -86,7 +98,7 @@ module.exports = (grunt) ->
 			minallimgs:
 				files: [
 					expand: true,
-					cwd: 'deploy',
+					cwd: 'source',
 					src: ['**/*.{png,gif}'],
 					dest: 'deploy']
 
@@ -120,6 +132,16 @@ module.exports = (grunt) ->
 					dest: deploydest
 				]
 
+		copy:
+			html:
+				files: [
+					expand: true,
+					cwd: 'source',
+					src: ['*.html'],
+					dest: 'deploy/',
+					filter: 'isFile'
+				]
+
 
 	#カスタムタスク
 
@@ -128,6 +150,7 @@ module.exports = (grunt) ->
 	grunt.registerTask 'compile_sass',['sass']
 	grunt.registerTask 'minifyjs',['uglify', 'clean:expanded_js']
 	grunt.registerTask 'minifycss',['cssmin', 'clean:expanded_css']
-	grunt.registerTask 'publish_dev',['uglify', 'cssmin', 'ftp-deploy']
+	grunt.registerTask 'deploy',['uglify', 'cssmin', 'imagemin', 'copy:html']
+	grunt.registerTask 'server', ['compile_sass', 'compile_coffee', 'connect', 'watch']
 
 
